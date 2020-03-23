@@ -78,8 +78,13 @@ def update_metrics():
     orig_df = pd.DataFrame(data)
     orig_df.dateTime = pd.to_datetime(orig_df.dateTime)
     orig_df.city = orig_df.city.str.title()
+    orig_df.loc[orig_df.state == "DC", ['city']] = 'Washington'
     orig_df["city_state"] = orig_df.city.str.title() + ", " + orig_df.state.str.upper()
     orig_df["labels"] = orig_df['city'] + "  (" + orig_df["state"] + ")"
+    # Remove NA values
+    values = "removing {} na values ".format(sum(orig_df.city_state.isna()))
+    logging.info(values)
+    orig_df = orig_df[orig_df.city_state.notna()]
     orig_df.street = orig_df.street.str.title()
     return orig_df, now
 
@@ -99,7 +104,7 @@ def update_date(n_intervals):
 def update_dropdown(children):
     orig_df, _ = update_metrics()
     # TODO would be nice not do this each time probably can cache too
-    df = orig_df.drop_duplicates(subset=['city_state']).dropna()
+    df = orig_df.drop_duplicates(subset=['city_state'])
     values = [{"label": label, "value": value} for label, value in zip(df['labels'], df['city_state']) if label]
     return sorted(values, key=lambda k: k['label'])
 
