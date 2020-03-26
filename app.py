@@ -11,6 +11,32 @@ import pandas as pd
 import logging
 
 app = dash.Dash(__name__)
+app.index_string = """<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-T5RQKS674Q"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'G-T5RQKS674Q');
+        </script>
+        {%metas%}
+        <title>{%title%}</title>
+        {%favicon%}
+        {%css%}
+    </head>
+    <body>
+        {%app_entry%}
+        <footer>
+            {%config%}
+            {%scripts%}
+            {%renderer%}
+        </footer>
+    </body>
+</html>"""
 app.title = 'Blocked Crossings'
 server = app.server
 server.config.from_object("settings")
@@ -66,6 +92,9 @@ app.layout = html.Div(
         html.Div(id='graph-container', className="u-max-full-width"),
         html.Div(id='ticker-text', className="row ticker-text"),
         dcc.Interval(id='interval', interval=server.config["UPDATE_INTERVAL"], n_intervals=0),
+        dcc.Markdown(
+            "Matthew Krump | [matthewkrump.com](https://matthewkrump.com/) | Rendered by [Dash](https://plotly.com/dash/)",
+            id='footer', className="footer", )
     ],
 )
 
